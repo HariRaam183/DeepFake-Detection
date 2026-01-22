@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Deepfake Detection</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #c3ecff, #f9f9ff);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: white;
+            width: 95%;
+            max-width: 600px;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        /* Custom File Upload */
+        .upload-box {
+            border: 2px dashed #4a90e2;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            color: #4a90e2;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        .upload-box:hover {
+            background: #f0f8ff;
+        }
+
+        input[type=file] {
+            display: none;
+        }
+
+        button {
+            margin-top: 15px;
+            padding: 12px;
+            width: 100%;
+            background: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #357abd;
+        }
+
+        /* Full Image Preview */
+        #previewImg {
+            width: 100%;
+            max-height: 400px;
+            margin-top: 15px;
+            border-radius: 10px;
+            object-fit: contain;
+            border: 1px solid #ddd;
+            display: none;
+        }
+
+        /* Result Box */
+        .result-box {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .real {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .fake {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        #resetBtn {
+            display: none;
+            background: #555;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>🧠 Deepfake Detection System</h1>
+
+    <!-- Custom Upload UI -->
+    <label class="upload-box">
+        📤 Click to Upload Image
+        <input type="file" id="fileInput">
+    </label>
+
+    <!-- Full Image Preview -->
+    <img id="previewImg">
+
+    <div style="height:20px;"></div> <!-- GAP -->
+
+    <button onclick="checkImage()">🔍 Check Image</button>
+    <button id="resetBtn" onclick="resetPage()">🔄 Check Another Image</button>
+
+    <!-- Result -->
+    <div id="resultBox"></div>
+
+</div>
+
+<script>
+let selectedFile = null;
+
+// Preview Image
+document.getElementById("fileInput").addEventListener("change", function(event) {
+    selectedFile = event.target.files[0];
+    const reader = new FileReader();
+    reader.onload = function() {
+        const img = document.getElementById("previewImg");
+        img.src = reader.result;
+        img.style.display = "block";
+    };
+    reader.readAsDataURL(selectedFile);
+});
+
+// Send Image to Flask WITHOUT REFRESH
+function checkImage() {
+    if (!selectedFile) {
+        alert("Please upload an image first!");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+
+    fetch("/predict_api", {
+        method: "POST",
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        const resultBox = document.getElementById("resultBox");
+        resultBox.className = "result-box " + (data.result === "FAKE" ? "fake" : "real");
+        resultBox.innerHTML = "Prediction Result: " + data.result;
+
+        document.getElementById("resetBtn").style.display = "block";
+    });
+}
+
+// Reset UI
+function resetPage() {
+    document.getElementById("previewImg").style.display = "none";
+    document.getElementById("resultBox").innerHTML = "";
+    document.getElementById("resetBtn").style.display = "none";
+    document.getElementById("fileInput").value = "";
+    selectedFile = null;
+}
+</script>
+
+</body>
+</html>
