@@ -1,5 +1,14 @@
 import os
+
+# ===== FORCE CPU ONLY (for Render/Heroku deployment) =====
+os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  # Suppress TF warnings
+
 import tensorflow as tf
+
+# Disable GPU explicitly
+tf.config.set_visible_devices([], 'GPU')
+
 import cv2
 import numpy as np
 import logging

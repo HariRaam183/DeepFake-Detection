@@ -5,8 +5,8 @@
 flask>=2.3.0
 werkzeug>=2.3.0
 
-# Machine Learning
-tensorflow>=2.10.0
+# Machine Learning (CPU only for cloud deployment)
+tensorflow-cpu>=2.10.0
 opencv-python-headless>=4.7.0
 numpy>=1.23.0
 pillow>=9.0.0
