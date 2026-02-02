@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My History - Deepfake Detection</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #c3ecff, #f9f9ff);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .navbar h2 {
+            color: #333;
+            margin: 0;
+        }
+
+        .navbar a {
+            color: #4a90e2;
+            text-decoration: none;
+            margin-left: 20px;
+            font-weight: 500;
+        }
+
+        .navbar a:hover {
+            text-decoration: underline;
+        }
+
+        .navbar .logout {
+            color: #e74c3c;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 25px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            text-align: center;
+        }
+
+        th {
+            background: #4a90e2;
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        img {
+            width: 100px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .result-real {
+            background: #d4edda;
+            color: #155724;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .result-fake {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 50px;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <h2>🧠 Deepfake Detection</h2>
+    <div>
+        <span>👤 {{ username }}</span>
+        <a href="/">Home</a>
+        <a href="/history">History</a>
+        <a href="/logout" class="logout">Logout</a>
+    </div>
+</div>
+
+<h1>📜 My Upload History</h1>
+
+{% if uploads %}
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Image</th>
+        <th>Filename</th>
+        <th>Result</th>
+        <th>Date & Time</th>
+    </tr>
+
+    {% for u in uploads %}
+    <tr>
+        <td>{{ u[0] }}</td>
+        <td><img src="/uploads/{{ u[1] }}"></td>
+        <td>{{ u[1] }}</td>
+        <td>
+            <span class="{% if u[2] == 'FAKE' %}result-fake{% else %}result-real{% endif %}">
+                {{ u[2] }}
+            </span>
+        </td>
+        <td>{{ u[3] }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<div class="empty">
+    <h3>No uploads yet!</h3>
+    <p>Start by uploading an image on the <a href="/">Home Page</a></p>
+</div>
+{% endif %}
+
+</body>
+</html>

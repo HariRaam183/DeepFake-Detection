@@ -6,13 +6,47 @@
 
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Arial, sans-serif;
             background: linear-gradient(135deg, #c3ecff, #f9f9ff);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
             margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .navbar h2 {
+            color: #333;
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .navbar a {
+            color: #4a90e2;
+            text-decoration: none;
+            margin-left: 15px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .navbar a:hover {
+            text-decoration: underline;
+        }
+
+        .navbar .logout {
+            color: #e74c3c;
         }
 
         .container {
@@ -23,6 +57,7 @@
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.15);
             text-align: center;
+            margin: 0 auto;
         }
 
         h1 {
@@ -38,6 +73,7 @@
             color: #4a90e2;
             font-size: 16px;
             margin-top: 10px;
+            display: block;
         }
 
         .upload-box:hover {
@@ -103,8 +139,19 @@
 
 <body>
 
+<!-- Navigation Bar -->
+<div class="navbar">
+    <h2>🧠 Deepfake Detection</h2>
+    <div>
+        <span>👤 {{ username }}</span>
+        <a href="/">Home</a>
+        <a href="/history">History</a>
+        <a href="/logout" class="logout">Logout</a>
+    </div>
+</div>
+
 <div class="container">
-    <h1>🧠 Deepfake Detection System</h1>
+    <h1>🔍 Check Your Image</h1>
 
     <!-- Custom Upload UI -->
     <label class="upload-box">
@@ -150,17 +197,35 @@ function checkImage() {
     const formData = new FormData();
     formData.append("file", selectedFile);
 
+    // Show loading
+    const resultBox = document.getElementById("resultBox");
+    resultBox.className = "result-box";
+    resultBox.innerHTML = "⏳ Analyzing image...";
+
     fetch("/predict_api", {
         method: "POST",
         body: formData
     })
-    .then(res => res.json())
+    .then(res => {
+        if (!res.ok) {
+            throw new Error("Server error: " + res.status);
+        }
+        return res.json();
+    })
     .then(data => {
-        const resultBox = document.getElementById("resultBox");
-        resultBox.className = "result-box " + (data.result === "FAKE" ? "fake" : "real");
-        resultBox.innerHTML = "Prediction Result: " + data.result;
-
+        if (data.error) {
+            resultBox.className = "result-box fake";
+            resultBox.innerHTML = "Error: " + data.error;
+        } else {
+            resultBox.className = "result-box " + (data.result === "FAKE" ? "fake" : "real");
+            resultBox.innerHTML = "Prediction Result: " + data.result;
+        }
         document.getElementById("resetBtn").style.display = "block";
+    })
+    .catch(error => {
+        resultBox.className = "result-box fake";
+        resultBox.innerHTML = "Error: " + error.message;
+        console.error("Error:", error);
     });
 }
 
